@@ -9,15 +9,23 @@ export default function BlogShow({ post }) {
         >
             <Head title={post.title} />
 
-            <div className="py-12">
+            <div
+                className="py-12 bg-fixed bg-contain bg-no-repeat bg-center"
+                style={{
+                    backgroundImage: "url('/images/show1.jpeg')",
+                    backgroundSize: '90% 100%',
+                }}
+            >
                 <div className="mx-auto max-w-4xl sm:px-6 lg:px-8">
-                    <div className="bg-white p-6 rounded-lg shadow">
+<div
+    className="bg-transparent p-6 rounded-lg shadow"
+    style={{ transform: 'translateX(-11rem)' }}
+>
                         <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
                         <p className="text-sm text-gray-500 mb-2">
                             Author: {post.author?.name}
                         </p>
 
-                        {/* ✅ Show Published Date */}
                         {post.published_at && (
                             <p className="text-sm text-green-600 font-semibold mb-4">
                                 Published on:{' '}

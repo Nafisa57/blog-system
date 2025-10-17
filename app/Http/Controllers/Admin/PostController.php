@@ -14,15 +14,6 @@ class PostController extends Controller
         $this->middleware(['auth', 'admin']);
     }
 
-    // Show all posts to admin
-    // public function index()
-    // {
-    //     $posts = Post::with('author')->latest()->paginate(10); // fetch all posts
-    //     return Inertia::render('Admin/Posts/Index', [
-    //         'posts' => $posts
-    //     ]);
-    // }
-
      public function index(Request $request)
 {
     $query = Post::with('author')

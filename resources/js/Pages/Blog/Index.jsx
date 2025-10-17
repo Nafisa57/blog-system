@@ -21,11 +21,9 @@ export default function BlogIndex({ posts, filters }) {
                 className="py-12 bg-fixed bg-cover bg-center"
                 style={{
                     backgroundImage: "url('/images/blog_bg.jpeg')",
-                    // backgroundPosition: 'center right 2rem',
                 }}
             >
                 <div className="mx-auto max-w-4xl sm:px-6 lg:px-8">
-                    {/* 🔍 Search Bar */}
                     <form onSubmit={handleSearch} className="mb-6 flex justify-center">
                         <input
                             type="text"

@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->string('title'); // title (required)
-            $table->text('content'); // content (required, min 100 chars validation will be in controller)
+            $table->string('title'); 
+            $table->text('content'); 
             $table->foreignId('author_id')->constrained('users')->onDelete('cascade'); // FK to users
             $table->timestamp('published_at')->nullable(); // nullable timestamp
             $table->timestamps();

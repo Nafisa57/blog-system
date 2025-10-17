@@ -14,15 +14,6 @@ class BlogController extends Controller
     public function index(Request $request)
     {
 
-        //  $posts = Post::with('author')
-        //     ->whereNotNull('published_at')
-        //     ->latest()
-        //     ->paginate(10);
-
-        // return Inertia::render('Blog/Index', [
-        //     'posts' => $posts,
-        // ]);
-
     $search = $request->input('search'); // get search term
 
     $posts = Post::with('author')
@@ -66,8 +57,7 @@ class BlogController extends Controller
      */
     public function show($id)
     {
-        // if (!$post->published_at) abort(404);
-        // return Inertia::render('Blog/Show', ['post' => $post]);
+      
 $post = Post::with('author')->findOrFail($id);
 
     if (!$post->published_at) {

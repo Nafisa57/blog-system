@@ -30,8 +30,7 @@ export default function PostsCreate() {
 
                 <div className="mx-auto max-w-2xl sm:px-6 lg:px-8 mt-6">
 
-                    {/* Flash message */}
-                    {flash?.success && (  // FIXED
+                    {flash?.success && (  
                         <div className="mb-4 p-3 bg-green-200 text-green-800 rounded">
                             {flash.success}
                         </div>
