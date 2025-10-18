@@ -15,25 +15,25 @@ class PostController extends Controller
     }
 
      public function index(Request $request)
-{
-    $query = Post::with('author')
-        ->when($request->has('published'), fn($q) => 
-            $q->whereNotNull('published_at'))
-        ->latest()
-        ->toSql(); // Add this line to see the SQL
+{ // Admin can view ALL posts
 
-    dd($query); // This will dump the SQL query
+     $query = Post::query();
 
-    $posts = Post::with('author')
-        ->when($request->has('published'), fn($q) => 
-            $q->whereNotNull('published_at'))
-        ->latest()
-        ->paginate(10);
+    // Filter by published/unpublished if requested
+    if ($request->has('published')) {
+        if ($request->published === 'published') {
+            $query->whereNotNull('published_at');
+        } elseif ($request->published === 'unpublished') {
+            $query->whereNull('published_at');
+        }
+    }
+
+    $posts = $query->with('author')->latest()->paginate(10)->withQueryString();
 
     return Inertia::render('Admin/Posts/Index', [
         'posts' => $posts,
-        'filters' => ['published' => $request->input('published')]
     ]);
+
 }
 
     public function edit(Post $post)

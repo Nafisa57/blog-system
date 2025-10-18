@@ -14,8 +14,8 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         // Check if the authenticated user is admin
-        if (! $request->user()?->is_admin) {
-            abort(403, 'Unauthorized'); // block access if not admin
+        if (!auth()->user() || !auth()->user()->is_admin) {
+            abort(403, 'Unauthorized action.');
         }
 
         return $next($request);

@@ -1,6 +1,7 @@
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Link, Inertia } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
+import { Inertia } from '@inertiajs/inertia';
 import { useState } from 'react';
 
 export default function AdminPostsIndex({ posts }) {
@@ -8,23 +9,47 @@ export default function AdminPostsIndex({ posts }) {
         published: null
     });
 
+    const handleDelete = (post) => {
+    if (confirm('Are you sure you want to delete this post?')) {
+        Inertia.delete(route('admin.posts.destroy', post.id));
+    }
+};
+
+
+const handlePublishToggle = (post) => {
+    const routeName = post.published_at
+        ? 'admin.posts.unpublish'
+        : 'admin.posts.publish';
+
+    Inertia.post(route(routeName, post.id), {}, {
+        onSuccess: () => {
+            Inertia.get(route('admin.posts.index'), { published: filters.published }, {
+                preserveState: true,
+                replace: true,
+            });
+        },
+    });
+};
+
+
     const handleFilterChange = (value) => {
-        setFilters(prev => ({
-            ...prev,
-            published: value
-        }));
-        
-        Inertia.get(route('admin.posts.index'), {
-            published: value
-        }, {
-            preserveState: true,
-            replace: true
-        });
-    };
+    setFilters(prev => ({ ...prev, published: value }));
+
+    Inertia.get(route('admin.posts.index'), { published: value }, {
+        preserveState: true,
+        replace: true,
+    });
+};
+
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold leading-tight">Admin Posts</h2>}>
-            <div className="py-12">
+           <div
+                className="py-12 bg-fixed bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: "url('/images/admin3.jpeg')",
+                    backgroundSize: '100% 100%',
+                 }}
+            >
                 <div className="mx-auto max-w-6xl space-y-6">
                     {/* Filter Controls */}
                     <div className="flex gap-4 mb-6">
@@ -34,23 +59,11 @@ export default function AdminPostsIndex({ posts }) {
                         >
                             All Posts
                         </button>
-                        <button
-                            onClick={() => handleFilterChange('published')}
-                            className={`px-3 py-1 rounded ${filters.published === 'published' ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                        >
-                            Published
-                        </button>
-                        <button
-                            onClick={() => handleFilterChange('unpublished')}
-                            className={`px-3 py-1 rounded ${filters.published === 'unpublished' ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                        >
-                            Unpublished
-                        </button>
                     </div>
 
                     {posts.data.length === 0 && <p>No posts found.</p>}
                     {posts.data.map(post => (
-                        <div key={post.id} className="bg-white p-6 rounded-lg shadow hover:shadow-md transition">
+                        <div key={post.id} className="bg-white p-6 rounded-lg shadow hover:shadow-black transition">
                             <h3 className="text-xl font-bold">{post.title}</h3>
                             <p className="text-gray-700 mb-2">{post.content.slice(0, 100)}...</p>
                             <p className="text-sm text-gray-500 mb-2">

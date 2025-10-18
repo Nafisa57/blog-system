@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role', // Added this so that it can set role during seeding or manually
     ];
 
     /**
@@ -48,6 +49,14 @@ class User extends Authenticatable
 
     public function posts()
 {
-return $this->hasMany(Post::class, 'author_id');}
+return $this->hasMany(Post::class, 'author_id');
+}
+
+
+    // Helper function to check if user is an admin
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
 
 }

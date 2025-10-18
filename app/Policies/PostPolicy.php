@@ -11,12 +11,14 @@ class PostPolicy
 {
     public function before(User $user, $ability)
     {
-        if ($user->is_admin) return true;
+        if ($user->role === 'admin') {
+            return true;
+        }
     }
 
     public function viewAny(User $user)
     {
-        return true; // Everyone can view posts
+        return true; // Everyone can view published posts
     }
 
     public function view(User $user, Post $post)
@@ -26,16 +28,16 @@ class PostPolicy
 
     public function update(User $user, Post $post)
     {
-        return $user->is_admin || $user->id === $post->author_id;
+        return $user->id === $post->author_id;
     }
 
     public function delete(User $user, Post $post)
     {
-        return $user->is_admin || $user->id === $post->author_id;
+        return $user->id === $post->author_id;
     }
 
     public function publish(User $user, Post $post)
     {
-        return $user->is_admin || $user->id === $post->author_id;
+        return $user->id === $post->author_id;
     }
 }

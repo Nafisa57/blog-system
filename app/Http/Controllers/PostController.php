@@ -15,16 +15,13 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $posts = auth()->user()
-            ->posts()
-            ->with('author')
-            ->latest()
-            ->paginate(10);
+        $posts = Post::where('author_id', auth()->id())
+                 ->latest()
+                 ->paginate(10);
 
-        return Inertia::render('Posts/Index', [
-            'posts' => $posts,
-            'flash' => session('success'),
-        ]);
+    return Inertia::render('Posts/Index', [
+        'posts' => $posts
+    ]);
 
 }
 

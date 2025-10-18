@@ -13,7 +13,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
     return (
         <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
+            <nav className="border-b border-transparent bg-transparent">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
                         <div className="flex">
@@ -44,6 +44,15 @@ export default function AuthenticatedLayout({ header, children }) {
     >
         Posts
     </NavLink>
+
+    {user.is_admin && (
+    <NavLink
+        href={route('admin.posts.index')}
+        active={route().current('admin.posts.index')}
+    >
+        Admin Posts
+    </NavLink>
+)}
                             </div>
                         </div>
 
@@ -161,9 +170,18 @@ export default function AuthenticatedLayout({ header, children }) {
     >
         Posts
     </ResponsiveNavLink>
+    {user.is_admin && (
+    <ResponsiveNavLink
+        href={route('admin.posts.index')}
+        active={route().current('admin.posts.index')}
+    >
+        Admin Posts
+    </ResponsiveNavLink>
+)}
+
                     </div>
 
-                    <div className="border-t border-gray-200 pb-1 pt-4">
+                    <div className="border-t border-transparent pb-1 pt-4">
                         <div className="px-4">
                             <div className="text-base font-medium text-gray-800">
                                 {user.name}
@@ -190,7 +208,7 @@ export default function AuthenticatedLayout({ header, children }) {
             </nav>
 
             {header && (
-                <header className="bg-white shadow">
+                <header className="bg-transparent ">
                     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                         {header}
                     </div>
