@@ -1,7 +1,5 @@
 <?php
 
-
-
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -9,6 +7,8 @@ use Inertia\Inertia;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\RoleController as AdminRoleController;   
 
 // Home / Welcome
 Route::get('/', function () {
@@ -27,20 +27,37 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Admin panel routes
-Route::middleware(['auth', 'admin'])
-    ->prefix('admin/posts')
-    ->name('admin.posts.')
-    ->group(function () {
-        Route::get('/', [AdminPostController::class, 'index'])->name('index');
-        Route::get('{post}/edit', [AdminPostController::class, 'edit'])->name('edit');
-        Route::put('{post}', [AdminPostController::class, 'update'])->name('update');
-        Route::delete('{post}', [AdminPostController::class, 'destroy'])->name('destroy');
-        Route::post('{post}/publish', [AdminPostController::class, 'publish'])->name('publish');
-        Route::post('{post}/unpublish', [AdminPostController::class, 'unpublish'])->name('unpublish');
+  Route::middleware(['role:Admin'])->prefix('admin')->name('admin.')->group(function () {
+
+        // --- Posts ---
+        Route::get('/posts', [AdminPostController::class, 'index'])->name('posts.index');
+        Route::get('/posts/{post}/edit', [AdminPostController::class, 'edit'])->name('posts.edit');
+        Route::put('/posts/{post}', [AdminPostController::class, 'update'])->name('posts.update');
+        Route::delete('/posts/{post}', [AdminPostController::class, 'destroy'])->name('posts.destroy');
+        Route::post('/posts/{post}/publish', [AdminPostController::class, 'publish'])->name('posts.publish');
+        Route::post('/posts/{post}/unpublish', [AdminPostController::class, 'unpublish'])->name('posts.unpublish');
+
+        // --- Users ---
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+        Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+        Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+
+        // --- Roles ---
+        Route::get('/roles', [AdminRoleController::class, 'index'])->name('roles.index');
+        Route::get('/roles/create', [AdminRoleController::class, 'create'])->name('roles.create');
+        Route::post('/roles', [AdminRoleController::class, 'store'])->name('roles.store');
+        Route::get('/roles/{role}/edit', [AdminRoleController::class, 'edit'])->name('roles.edit');
+        Route::put('/roles/{role}', [AdminRoleController::class, 'update'])->name('roles.update');
+        Route::delete('/roles/{role}', [AdminRoleController::class, 'destroy'])->name('roles.destroy');
+        Route::get('/roles/{role}', [AdminRoleController::class, 'show'])->name('roles.show');
+
     });
 
-// Author (regular user) posts
+// ✍️ Author (regular user) posts
 Route::middleware('auth')->group(function () {
     Route::get('/posts', [PostController::class, 'index'])->name('posts.index'); // Only author's posts
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
@@ -52,15 +69,21 @@ Route::middleware('auth')->group(function () {
     Route::post('/posts/{post}/publish', [PostController::class, 'togglePublish'])->name('posts.publish');
 });
 
-// Public blog routes
+// 🌍 Public blog routes
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{id}', [BlogController::class, 'show'])->name('blog.show');
 
-// In routes/web.php
+// Ziggy route helper (for Inertia)
 Route::get('/ziggy', function () {
     return response()->json(app('ziggy')->toArray());
 });
 
-
 // Auth routes
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
+
+
+
+
+
+
+

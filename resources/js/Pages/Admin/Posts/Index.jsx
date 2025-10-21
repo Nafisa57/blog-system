@@ -1,4 +1,5 @@
 
+
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link } from '@inertiajs/react';
 import { Inertia } from '@inertiajs/inertia';
@@ -10,47 +11,43 @@ export default function AdminPostsIndex({ posts }) {
     });
 
     const handleDelete = (post) => {
-    if (confirm('Are you sure you want to delete this post?')) {
-        Inertia.delete(route('admin.posts.destroy', post.id));
-    }
-};
+        if (confirm('Are you sure you want to delete this post?')) {
+            Inertia.delete(route('admin.posts.destroy', post.id));
+        }
+    };
 
+    const handlePublishToggle = (post) => {
+        const routeName = post.published_at
+            ? 'admin.posts.unpublish'
+            : 'admin.posts.publish';
 
-const handlePublishToggle = (post) => {
-    const routeName = post.published_at
-        ? 'admin.posts.unpublish'
-        : 'admin.posts.publish';
-
-    Inertia.post(route(routeName, post.id), {}, {
-        onSuccess: () => {
-            Inertia.get(route('admin.posts.index'), { published: filters.published }, {
-                preserveState: true,
-                replace: true,
-            });
-        },
-    });
-};
-
+        Inertia.post(route(routeName, post.id), {}, {
+            onSuccess: () => {
+                Inertia.get(route('admin.posts.index'), { published: filters.published }, {
+                    preserveState: true,
+                    replace: true,
+                });
+            },
+        });
+    };
 
     const handleFilterChange = (value) => {
-    setFilters(prev => ({ ...prev, published: value }));
+        setFilters(prev => ({ ...prev, published: value }));
 
-    Inertia.get(route('admin.posts.index'), { published: value }, {
-        preserveState: true,
-        replace: true,
-    });
-};
-
+        Inertia.get(route('admin.posts.index'), { published: value }, {
+            preserveState: true,
+            replace: true,
+        });
+    };
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold leading-tight">Admin Posts</h2>}>
-           <div
+            <div
                 className="py-12 bg-fixed bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: "url('/images/admin3.jpeg')",
-                    backgroundSize: '100% 100%',
-                 }}
+                style={{ backgroundImage: "url('/images/admin3.jpeg')", backgroundSize: '100% 100%' }}
             >
                 <div className="mx-auto max-w-6xl space-y-6">
+
                     {/* Filter Controls */}
                     <div className="flex gap-4 mb-6">
                         <button
@@ -59,9 +56,21 @@ const handlePublishToggle = (post) => {
                         >
                             All Posts
                         </button>
+                        <button onClick={() => Inertia.visit(route('admin.users.index'))}
+                            className={`px-3 py-1 rounded ${filters.published === true ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                        >
+                            Users
+                        </button>
+                        <button onClick={() => Inertia.visit(route('admin.roles.index'))}
+                            className={`px-3 py-1 rounded ${filters.published === false ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                        >
+                            Roles
+                        </button>
                     </div>
 
+                    {/* Posts List */}
                     {posts.data.length === 0 && <p>No posts found.</p>}
+
                     {posts.data.map(post => (
                         <div key={post.id} className="bg-white p-6 rounded-lg shadow hover:shadow-black transition">
                             <h3 className="text-xl font-bold">{post.title}</h3>
@@ -85,9 +94,7 @@ const handlePublishToggle = (post) => {
                                 </button>
                                 <button
                                     onClick={() => handlePublishToggle(post)}
-                                    className={`px-3 py-1 rounded ${
-                                        post.published_at ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-blue-600 text-white hover:bg-blue-700'
-                                    }`}
+                                    className={`px-3 py-1 rounded ${post.published_at ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                                 >
                                     {post.published_at ? 'Unpublish' : 'Publish'}
                                 </button>
@@ -102,14 +109,13 @@ const handlePublishToggle = (post) => {
                                 <span
                                     key={index}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
-                                    className={`px-3 py-1 rounded ${
-                                        link.active ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                    } mx-1 cursor-pointer`}
+                                    className={`px-3 py-1 rounded ${link.active ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'} mx-1 cursor-pointer`}
                                     onClick={() => link.url && (window.location.href = link.url)}
                                 />
                             ))}
                         </div>
                     )}
+
                 </div>
             </div>
         </AuthenticatedLayout>

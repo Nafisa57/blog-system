@@ -11,9 +11,9 @@ class PostPolicy
 {
     public function before(User $user, $ability)
     {
-        if ($user->role === 'admin') {
-            return true;
-        }
+         if ($user->hasRole('Admin')) {
+        return true;
+    }
     }
 
     public function viewAny(User $user)
