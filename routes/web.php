@@ -27,37 +27,98 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-  Route::middleware(['role:Admin'])->prefix('admin')->name('admin.')->group(function () {
 
-        // --- Posts ---
-        Route::get('/posts', [AdminPostController::class, 'index'])->name('posts.index');
-        Route::get('/posts/{post}/edit', [AdminPostController::class, 'edit'])->name('posts.edit');
-        Route::put('/posts/{post}', [AdminPostController::class, 'update'])->name('posts.update');
-        Route::delete('/posts/{post}', [AdminPostController::class, 'destroy'])->name('posts.destroy');
-        Route::post('/posts/{post}/publish', [AdminPostController::class, 'publish'])->name('posts.publish');
-        Route::post('/posts/{post}/unpublish', [AdminPostController::class, 'unpublish'])->name('posts.unpublish');
+//  Group all admin routes together
+Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
 
-        // --- Users ---
-        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
-        Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
-        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
-        Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
-        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
-        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
-        Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+    // --- Posts ---
+    Route::get('/posts', [AdminPostController::class, 'index'])
+        ->middleware('permission:view posts')
+        ->name('posts.index');
 
-        // --- Roles ---
-        Route::get('/roles', [AdminRoleController::class, 'index'])->name('roles.index');
-        Route::get('/roles/create', [AdminRoleController::class, 'create'])->name('roles.create');
-        Route::post('/roles', [AdminRoleController::class, 'store'])->name('roles.store');
-        Route::get('/roles/{role}/edit', [AdminRoleController::class, 'edit'])->name('roles.edit');
-        Route::put('/roles/{role}', [AdminRoleController::class, 'update'])->name('roles.update');
-        Route::delete('/roles/{role}', [AdminRoleController::class, 'destroy'])->name('roles.destroy');
-        Route::get('/roles/{role}', [AdminRoleController::class, 'show'])->name('roles.show');
+    Route::get('/posts/{post}/edit', [AdminPostController::class, 'edit'])
+        ->middleware('permission:edit posts')
+        ->name('posts.edit');
 
-    });
+    Route::put('/posts/{post}', [AdminPostController::class, 'update'])
+        ->middleware('permission:edit posts')
+        ->name('posts.update');
 
-// ✍️ Author (regular user) posts
+    Route::delete('/posts/{post}', [AdminPostController::class, 'destroy'])
+        ->middleware('permission:delete posts')
+        ->name('posts.destroy');
+
+    Route::post('/posts/{post}/publish', [AdminPostController::class, 'publish'])
+        ->middleware('permission:publish posts')
+        ->name('posts.publish');
+
+    Route::post('/posts/{post}/unpublish', [AdminPostController::class, 'unpublish'])
+        ->middleware('permission:unpublish posts')
+        ->name('posts.unpublish');
+
+    // --- Users ---
+    Route::get('/users', [AdminUserController::class, 'index'])
+        ->middleware('permission:view users')
+        ->name('users.index');
+
+    Route::get('/users/create', [AdminUserController::class, 'create'])
+        ->middleware('permission:create users')
+        ->name('users.create');
+
+    Route::post('/users', [AdminUserController::class, 'store'])
+        ->middleware('permission:create users')
+        ->name('users.store');
+
+    Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])
+        ->middleware('permission:edit users')
+        ->name('users.edit');
+
+    Route::put('/users/{user}', [AdminUserController::class, 'update'])
+        ->middleware('permission:edit users')
+        ->name('users.update');
+
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])
+        ->middleware('permission:delete users')
+        ->name('users.destroy');
+
+    Route::get('/users/{user}', [AdminUserController::class, 'show'])
+        ->middleware('permission:view users')
+        ->name('users.show');
+
+    // --- Roles ---
+    Route::get('/roles', [AdminRoleController::class, 'index'])
+        ->middleware('permission:view roles')
+        ->name('roles.index');
+
+    Route::get('/roles/create', [AdminRoleController::class, 'create'])
+        ->middleware('permission:create roles')
+        ->name('roles.create');
+
+    Route::post('/roles', [AdminRoleController::class, 'store'])
+        ->middleware('permission:create roles')
+        ->name('roles.store');
+
+    Route::get('/roles/{role}/edit', [AdminRoleController::class, 'edit'])
+        ->middleware('permission:edit roles')
+        ->name('roles.edit');
+
+    Route::put('/roles/{role}', [AdminRoleController::class, 'update'])
+        ->middleware('permission:edit roles')
+        ->name('roles.update');
+
+    Route::delete('/roles/{role}', [AdminRoleController::class, 'destroy'])
+        ->middleware('permission:delete roles')
+        ->name('roles.destroy');
+
+    Route::get('/roles/{role}', [AdminRoleController::class, 'show'])
+        ->middleware('permission:view roles')
+        ->name('roles.show');
+});
+
+
+
+
+//  Author (regular user) posts
 Route::middleware('auth')->group(function () {
     Route::get('/posts', [PostController::class, 'index'])->name('posts.index'); // Only author's posts
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
@@ -69,7 +130,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/posts/{post}/publish', [PostController::class, 'togglePublish'])->name('posts.publish');
 });
 
-// 🌍 Public blog routes
+//  Public blog routes
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{id}', [BlogController::class, 'show'])->name('blog.show');
 

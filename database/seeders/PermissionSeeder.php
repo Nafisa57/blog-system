@@ -1,10 +1,12 @@
 <?php
 
+
+
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
@@ -13,21 +15,25 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
+        //  List all permissions
         $permissions = [
-            'user.view',
-            'user.create',
-            'user.edit',
-            'user.delete',
-            'role.view',
-            'role.create',
-            'role.edit',
-            'role.delete',
-            'permission.view',
-            'permission.create',
-            'permission.edit',
-            'permission.delete',
+            'view users',
+            'create users',
+            'edit users',
+            'delete users',
+            'view roles',
+            'create roles',
+            'edit roles',
+            'delete roles',
+            'view posts',
+            'create posts',
+            'edit posts',
+            'delete posts',
+            'publish posts',
+            'unpublish posts',
         ];
 
+        //  Create each permission
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
                 'name' => $permission,
@@ -35,6 +41,12 @@ class PermissionSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Permissions seeded successfully!');
+        //  Create Admin role (if not exists)
+        $adminRole = Role::firstOrCreate(['name' => 'Admin']);
+
+        // Assign all permissions to Admin role
+        $adminRole->syncPermissions(Permission::all());
+
+        $this->command->info('Permissions and Admin role seeded successfully!');
     }
-    }
+}

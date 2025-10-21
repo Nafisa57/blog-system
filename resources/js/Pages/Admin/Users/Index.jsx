@@ -1,11 +1,17 @@
 
 
+
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link } from '@inertiajs/react';
 import { Inertia } from '@inertiajs/inertia';
 
-export default function Index({ users }) {
+export default function Index({ users, permissions }) {
+    const canEdit = permissions.includes('edit users');
+    const canDelete = permissions.includes('delete users');
+    const canCreate = permissions.includes('create users');
+
     const handleDelete = (user) => {
+        if (!canDelete) return alert('You do not have permission!');
         if (confirm(`Are you sure you want to delete ${user.name}?`)) {
             Inertia.delete(route('admin.users.destroy', user.id));
         }
@@ -17,12 +23,14 @@ export default function Index({ users }) {
                 {/* Top Bar */}
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-lg font-semibold text-gray-700">All Registered Users</h3>
-                    <Link
-                        href={route('admin.users.create')}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200"
-                    >
-                        + Create User
-                    </Link>
+                    {canCreate && (
+                        <Link
+                            href={route('admin.users.create')}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200"
+                        >
+                            + Create User
+                        </Link>
+                    )}
                 </div>
 
                 {/* Table */}
@@ -41,9 +49,7 @@ export default function Index({ users }) {
                                 users.map((u, index) => (
                                     <tr
                                         key={u.id}
-                                        className={`${
-                                            index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                                        } hover:bg-blue-50 transition-colors`}
+                                        className={`${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors`}
                                     >
                                         <td className="border px-4 py-3">{u.id}</td>
                                         <td className="border px-4 py-3 font-medium">{u.name}</td>
@@ -68,27 +74,28 @@ export default function Index({ users }) {
                                             >
                                                 Show
                                             </Link>
-                                            <Link
-                                                href={route('admin.users.edit', u.id)}
-                                                className="text-yellow-600 hover:text-yellow-800 font-medium"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(u)}
-                                                className="text-red-600 hover:text-red-800 font-medium"
-                                            >
-                                                Delete
-                                            </button>
+                                            {canEdit && (
+                                                <Link
+                                                    href={route('admin.users.edit', u.id)}
+                                                    className="text-yellow-600 hover:text-yellow-800 font-medium"
+                                                >
+                                                    Edit
+                                                </Link>
+                                            )}
+                                            {canDelete && (
+                                                <button
+                                                    onClick={() => handleDelete(u)}
+                                                    className="text-red-600 hover:text-red-800 font-medium"
+                                                >
+                                                    Delete
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td
-                                        colSpan="4"
-                                        className="text-center py-6 text-gray-500 italic bg-gray-50"
-                                    >
+                                    <td colSpan="4" className="text-center py-6 text-gray-500 italic bg-gray-50">
                                         No users found.
                                     </td>
                                 </tr>
@@ -100,4 +107,5 @@ export default function Index({ users }) {
         </AuthenticatedLayout>
     );
 }
+
 

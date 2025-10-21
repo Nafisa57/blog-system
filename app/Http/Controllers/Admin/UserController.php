@@ -9,27 +9,22 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Inertia\Inertia;
 use Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with('roles')->get(); // plain collection
+        $users = User::with('roles')->get();
 
         return Inertia::render('Admin/Users/Index', [
-            'users' => $users->map(function($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'roles' => $user->roles->map(function($role) {
-                        return [
-                            'id' => $role->id,
-                            'name' => $role->name,
-                        ];
-                    })->toArray(),
-                ];
-            })->toArray(),
+            'users' => $users->map(fn($user) => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->roles->map(fn($role) => ['id' => $role->id, 'name' => $role->name])->toArray(),
+            ]),
+            'permissions' => Auth::user()->getAllPermissions()->pluck('name')->toArray(),
         ]);
     }
 
@@ -62,13 +57,12 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $roles = Role::all()->map(fn($role) => ['id' => $role->id, 'name' => $role->name]);
-
         return Inertia::render('Admin/Users/Edit', [
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'roles' => $user->roles->pluck('name')->toArray(),
+                'roles' => $user->roles->pluck('id')->toArray(),
             ],
             'roles' => $roles
         ]);
@@ -90,6 +84,10 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        if (!auth()->user()->can('delete users')) {
+            abort(403);
+        }
+
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'User deleted!');
     }

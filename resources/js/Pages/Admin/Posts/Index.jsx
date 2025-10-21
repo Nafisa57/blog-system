@@ -5,22 +5,23 @@ import { Link } from '@inertiajs/react';
 import { Inertia } from '@inertiajs/inertia';
 import { useState } from 'react';
 
-export default function AdminPostsIndex({ posts }) {
-    const [filters, setFilters] = useState({
-        published: null
-    });
+export default function AdminPostsIndex({ posts, permissions }) {
+    const canEdit = permissions.includes('edit posts');
+    const canDelete = permissions.includes('delete posts');
+    const canPublish = permissions.includes('publish posts');
+
+    const [filters, setFilters] = useState({ published: null });
 
     const handleDelete = (post) => {
+        if (!canDelete) return alert('You do not have permission!');
         if (confirm('Are you sure you want to delete this post?')) {
             Inertia.delete(route('admin.posts.destroy', post.id));
         }
     };
 
     const handlePublishToggle = (post) => {
-        const routeName = post.published_at
-            ? 'admin.posts.unpublish'
-            : 'admin.posts.publish';
-
+        if (!canPublish) return alert('You do not have permission!');
+        const routeName = post.published_at ? 'admin.posts.unpublish' : 'admin.posts.publish';
         Inertia.post(route(routeName, post.id), {}, {
             onSuccess: () => {
                 Inertia.get(route('admin.posts.index'), { published: filters.published }, {
@@ -33,7 +34,6 @@ export default function AdminPostsIndex({ posts }) {
 
     const handleFilterChange = (value) => {
         setFilters(prev => ({ ...prev, published: value }));
-
         Inertia.get(route('admin.posts.index'), { published: value }, {
             preserveState: true,
             replace: true,
@@ -80,24 +80,30 @@ export default function AdminPostsIndex({ posts }) {
                                 {post.published_at ? ` Published: ${new Date(post.published_at).toLocaleString()}` : ' Not Published'}
                             </p>
                             <div className="flex space-x-2">
-                                <Link
-                                    href={route('admin.posts.edit', post.id)}
-                                    className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                                >
-                                    Edit
-                                </Link>
-                                <button
-                                    onClick={() => handleDelete(post)}
-                                    className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                                >
-                                    Delete
-                                </button>
-                                <button
-                                    onClick={() => handlePublishToggle(post)}
-                                    className={`px-3 py-1 rounded ${post.published_at ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
-                                >
-                                    {post.published_at ? 'Unpublish' : 'Publish'}
-                                </button>
+                                {canEdit && (
+                                    <Link
+                                        href={route('admin.posts.edit', post.id)}
+                                        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                                    >
+                                        Edit
+                                    </Link>
+                                )}
+                                {canDelete && (
+                                    <button
+                                        onClick={() => handleDelete(post)}
+                                        className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                                    >
+                                        Delete
+                                    </button>
+                                )}
+                                {canPublish && (
+                                    <button
+                                        onClick={() => handlePublishToggle(post)}
+                                        className={`px-3 py-1 rounded ${post.published_at ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                                    >
+                                        {post.published_at ? 'Unpublish' : 'Publish'}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -121,3 +127,4 @@ export default function AdminPostsIndex({ posts }) {
         </AuthenticatedLayout>
     );
 }
+
